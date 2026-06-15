@@ -1,0 +1,57 @@
+<!doctype html>
+<!--
+  Seed page: rotating-hero  →  label: noise
+  No variant switch: a marketing hero rotates its background hue + featured
+  testimonial on every load (keyed off Date.now()), the way a real carousel /
+  A-B banner does. Two sequential captures differ in the hero region but the page
+  is structurally identical — content churn, not a regression.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lumen — Ship faster</title>
+    <style>
+      :root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #fff; color: #111827; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 22px 56px; }
+      .brand { font-weight: 800; font-size: 20px; }
+      nav a { margin-left: 24px; text-decoration: none; color: #374151; font-size: 14px; }
+      .hero { margin: 0 56px; border-radius: 20px; padding: 72px 56px; color: #fff; }
+      .hero h1 { font-size: 44px; margin: 0 0 12px; max-width: 620px; line-height: 1.1; }
+      .hero p { font-size: 18px; opacity: .92; max-width: 540px; margin: 0 0 28px; }
+      .hero .btn { background: #fff; color: #111827; padding: 13px 22px; border-radius: 10px;
+                   font-weight: 700; text-decoration: none; }
+      .quote { margin: 40px 56px 0; font-size: 18px; color: #374151; border-left: 3px solid #e5e7eb; padding-left: 18px; }
+      .quote span { display: block; margin-top: 8px; color: #6b7280; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="brand">Lumen</span>
+      <nav><a href="#">Product</a><a href="#">Pricing</a><a href="#">Docs</a></nav>
+    </header>
+    <section class="hero" id="hero">
+      <h1>Ship faster with confidence</h1>
+      <p>Lumen catches regressions before your customers do — across every screen.</p>
+      <a class="btn" href="#">Start free</a>
+    </section>
+    <blockquote class="quote" id="quote"></blockquote>
+    <script>
+      // Hue + testimonial are chosen from the clock each load — a real rotating
+      // banner. Guaranteed to differ between two sequential captures.
+      var t = Date.now();
+      var hue = t % 360;
+      document.getElementById("hero").style.background =
+        "linear-gradient(135deg, hsl(" + hue + ",72%,48%), hsl(" + ((hue + 40) % 360) + ",70%,40%))";
+      var quotes = [
+        ['"Cut our visual-bug triage time in half."', "— Dana R., Staff Engineer"],
+        ['"The diff review just works. We trust it."', "— Priya M., Eng Lead"],
+        ['"Caught a checkout break before launch."', "— Sam T., Frontend"],
+        ['"Our designers finally stopped filing pixel bugs."', "— Alex K., Design Ops"]
+      ];
+      var q = quotes[t % quotes.length];
+      document.getElementById("quote").innerHTML = q[0] + "<span>" + q[1] + "</span>";
+    </script>
+  </body>
+</html>

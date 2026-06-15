@@ -1,0 +1,62 @@
+<!doctype html>
+<!--
+  Seed page: overflow-break  →  label: real_regression
+  Baseline (?v=baseline): a tidy product grid, every tile contained.
+  Current  (?v=broken):   one tile's image is sized past its container
+  (width:160%), overflowing into siblings and shoving the grid — a real break.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Northwind — Shop</title>
+    <style>
+      :root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #fff; color: #1a202c; }
+      header { display: flex; justify-content: space-between; align-items: center;
+               padding: 20px 40px; border-bottom: 1px solid #edf0f4; }
+      .brand { font-weight: 700; font-size: 19px; }
+      nav a { margin-left: 22px; color: #4a5568; text-decoration: none; font-size: 14px; }
+      main { max-width: 1080px; margin: 0 auto; padding: 40px; }
+      h1 { font-size: 26px; margin: 0 0 24px; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+      .tile { border: 1px solid #edf0f4; border-radius: 10px; overflow: hidden; }
+      .tile .thumb { height: 150px; display: flex; align-items: center; justify-content: center;
+                     color: #fff; font-weight: 600; font-size: 15px; }
+      .tile:nth-child(1) .thumb { background: #2b6cb0; }
+      .tile:nth-child(2) .thumb { background: #2f855a; }
+      .tile:nth-child(3) .thumb { background: #b7791f; }
+      .tile:nth-child(4) .thumb { background: #6b46c1; }
+      .tile:nth-child(5) .thumb { background: #c05621; }
+      .tile:nth-child(6) .thumb { background: #319795; }
+      .tile .body { padding: 14px 16px; }
+      .tile h3 { margin: 0 0 4px; font-size: 15px; }
+      .tile .price { color: #2d3748; font-weight: 700; }
+      /* The break: one image blows past its tile and overruns the grid. */
+      body.broken .tile.spotlight { overflow: visible; }
+      body.broken .tile.spotlight .thumb { width: 160%; height: 230px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="brand">Northwind</span>
+      <nav><a href="#">Shop</a><a href="#">Deals</a><a href="#">Account</a></nav>
+    </header>
+    <main>
+      <h1>New this week</h1>
+      <div class="grid">
+        <div class="tile"><div class="thumb">Headphones</div><div class="body"><h3>Studio 3</h3><div class="price">$149</div></div></div>
+        <div class="tile spotlight"><div class="thumb">Keyboard</div><div class="body"><h3>Mech Pro</h3><div class="price">$89</div></div></div>
+        <div class="tile"><div class="thumb">Mouse</div><div class="body"><h3>Glide X</h3><div class="price">$59</div></div></div>
+        <div class="tile"><div class="thumb">Webcam</div><div class="body"><h3>Clear 4K</h3><div class="price">$120</div></div></div>
+        <div class="tile"><div class="thumb">Monitor</div><div class="body"><h3>UltraView</h3><div class="price">$399</div></div></div>
+        <div class="tile"><div class="thumb">Dock</div><div class="body"><h3>Hub 7</h3><div class="price">$79</div></div></div>
+      </div>
+    </main>
+    <script>
+      if (new URLSearchParams(location.search).get("v") === "broken") {
+        document.body.classList.add("broken");
+      }
+    </script>
+  </body>
+</html>

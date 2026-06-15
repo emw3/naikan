@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    // Node types are the cross-runtime standard (Buffer/process/fetch/crypto) —
+    // NOT bun-types, so the kernel package stays runtime-agnostic per ADR-0005.
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

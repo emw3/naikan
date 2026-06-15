@@ -1,0 +1,366 @@
+{
+  "version": 1,
+  "fixtures": [
+    {
+      "id": "brand-restyle",
+      "label": "intentional",
+      "source": "synthetic",
+      "viewport": "desktop",
+      "diffPct": 0.011811728395061729,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP 40ms, 4KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "synthetic/brand-restyle/baseline.png",
+        "current": "synthetic/brand-restyle/current.png",
+        "diff": "synthetic/brand-restyle/diff.png"
+      },
+      "notes": "Deliberate rebrand: indigo→teal, squared→pill buttons, flat→shadowed cards. Layout intact."
+    },
+    {
+      "id": "layout-break",
+      "label": "real_regression",
+      "source": "synthetic",
+      "viewport": "desktop",
+      "diffPct": 0.02395138888888889,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP 52ms, 3KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "synthetic/layout-break/baseline.png",
+        "current": "synthetic/layout-break/current.png",
+        "diff": "synthetic/layout-break/diff.png"
+      },
+      "notes": "Pricing card pulled out of flow (position:absolute) and overlapping its neighbours."
+    },
+    {
+      "id": "live-clock",
+      "label": "noise",
+      "source": "synthetic",
+      "viewport": "desktop",
+      "diffPct": 0.0005239197530864198,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP 48ms, 4KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "synthetic/live-clock/baseline.png",
+        "current": "synthetic/live-clock/current.png",
+        "diff": "synthetic/live-clock/diff.png"
+      },
+      "notes": "Status page timestamp + request id tick between captures; structure unchanged."
+    },
+    {
+      "id": "overflow-break",
+      "label": "real_regression",
+      "source": "synthetic",
+      "viewport": "desktop",
+      "diffPct": 0.15927700617283952,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP 44ms, 4KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "synthetic/overflow-break/baseline.png",
+        "current": "synthetic/overflow-break/current.png",
+        "diff": "synthetic/overflow-break/diff.png"
+      },
+      "notes": "Product image sized to 160% overflows its tile and shoves the grid out of alignment."
+    },
+    {
+      "id": "rotating-hero",
+      "label": "noise",
+      "source": "synthetic",
+      "viewport": "desktop",
+      "diffPct": 0.3019429012345679,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP 32ms, 3KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "synthetic/rotating-hero/baseline.png",
+        "current": "synthetic/rotating-hero/current.png",
+        "diff": "synthetic/rotating-hero/diff.png"
+      },
+      "notes": "Marketing hero rotates its background hue + testimonial each load, like a carousel."
+    },
+    {
+      "id": "type-restyle",
+      "label": "intentional",
+      "source": "synthetic",
+      "viewport": "desktop",
+      "diffPct": 0.023934413580246915,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP 32ms, 3KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "synthetic/type-restyle/baseline.png",
+        "current": "synthetic/type-restyle/current.png",
+        "diff": "synthetic/type-restyle/diff.png"
+      },
+      "notes": "Typography refresh: serif→sans body, looser leading, accent-coloured headings. Intentional."
+    },
+    {
+      "id": "random-photo",
+      "label": "noise",
+      "source": "curated",
+      "viewport": "desktop",
+      "diffPct": 0.9570123456790124,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no console errors"
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": true,
+          "severity": "warning",
+          "detail": "LCP n/a, 315KB, 1 requests"
+        }
+      ],
+      "images": {
+        "baseline": "curated/random-photo/baseline.png",
+        "current": "curated/random-photo/current.png",
+        "diff": "curated/random-photo/diff.png"
+      },
+      "notes": "Lorem Picsum returns a different random photo each load at fixed dimensions — content rotation, not a regression. Label human-confirmed (issue #05).",
+      "sourceUrls": {
+        "baseline": "https://picsum.photos/1440/900",
+        "current": "https://picsum.photos/1440/900"
+      }
+    },
+    {
+      "id": "real-broken-css",
+      "label": "real_regression",
+      "source": "curated",
+      "viewport": "desktop",
+      "diffPct": 1,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": false,
+          "severity": "warning",
+          "detail": "16 console errors: Loading the stylesheet 'https://a248.e.akamai.net/assets.github.com/stylesheets/bundles/github-83f6d9de9d84b203707ab4ba8bdf0bd6478f0d5b.css' violates the following Content Security Policy directive: \"default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob: archive.org web.archive.org web-static.archive.org wayback-api.archive.org athena.archive.org analytics.archive.org pragma.archivelab.org wwwb-events.archive.org\". Note that 'style-src-elem' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked."
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": false,
+          "severity": "warning",
+          "detail": "LCP 15484ms > 2500ms"
+        }
+      ],
+      "images": {
+        "baseline": "curated/real-broken-css/baseline.png",
+        "current": "curated/real-broken-css/current.png"
+      },
+      "notes": "Same GitHub 2012 page rendered with its stylesheet (baseline) vs with the stylesheet failing to load (current) — the classic unstyled-page regression. Label human-confirmed (issue #05).",
+      "sourceUrls": {
+        "baseline": "https://web.archive.org/web/20120601000000if_/https://github.com/",
+        "current": "https://web.archive.org/web/20120601000000id_/https://github.com/"
+      }
+    },
+    {
+      "id": "real-redesign-github",
+      "label": "intentional",
+      "source": "curated",
+      "viewport": "desktop",
+      "diffPct": 1,
+      "signals": [
+        {
+          "kind": "load",
+          "pass": true,
+          "severity": "critical",
+          "detail": "HTTP 200"
+        },
+        {
+          "kind": "console",
+          "pass": false,
+          "severity": "warning",
+          "detail": "1 console error: Loading the image 'https://github.githubassets.com/favicons/favicon.png' violates the following Content Security Policy directive: \"default-src 'self' 'unsafe-eval' 'unsafe-inline' data: blob: archive.org web.archive.org web-static.archive.org wayback-api.archive.org athena.archive.org analytics.archive.org pragma.archivelab.org wwwb-events.archive.org\". Note that 'img-src' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked."
+        },
+        {
+          "kind": "selector",
+          "pass": true,
+          "severity": "warning",
+          "detail": "no required selectors"
+        },
+        {
+          "kind": "perf",
+          "pass": false,
+          "severity": "warning",
+          "detail": "LCP 4504ms > 2500ms"
+        }
+      ],
+      "images": {
+        "baseline": "curated/real-redesign-github/baseline.png",
+        "current": "curated/real-redesign-github/current.png"
+      },
+      "notes": "GitHub home, 2012 vs 2023 Wayback snapshots — deliberate multi-year redesign. Label human-confirmed (issue #05).",
+      "sourceUrls": {
+        "baseline": "https://web.archive.org/web/20120601000000if_/https://github.com/",
+        "current": "https://web.archive.org/web/20230601000000if_/https://github.com/"
+      }
+    }
+  ]
+}

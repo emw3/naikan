@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Pure decision logic — only the `Date` global is used, so no Bun or Node
+    // types are needed. Stays runtime-agnostic per ADR-0005 (imported by the
+    // Node worker via config-repo), like the other kernel packages.
+    "lib": ["ESNext"],
+    "types": []
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.local
+.dev/
+.DS_Store
+coverage/
+.svelte-kit/
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+.impeccable/

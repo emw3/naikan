@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    // Node types for Buffer; no DOM lib — the browser-side snippets in the live
+    // driver are passed as strings, so no `document` reference is type-checked
+    // here. No bun-types either: the kernel stays runtime-agnostic (ADR-0005).
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

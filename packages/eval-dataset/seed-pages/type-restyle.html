@@ -1,0 +1,51 @@
+<!doctype html>
+<!--
+  Seed page: type-restyle  →  label: intentional
+  Baseline (?v=baseline):  serif body, tight leading, heavy dark headings.
+  Current  (?v=restyled):  sans-serif body, looser leading, lighter heading
+  weight + accent color. A typography refresh — text reflows and recolors, but
+  it is a deliberate design change, not breakage.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Ledger — Article</title>
+    <style>
+      body { margin: 0; background: #fbfbf9; color: #1c1c1c;
+             font-family: Georgia, "Times New Roman", serif; }
+      .restyled { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      article { max-width: 680px; margin: 0 auto; padding: 64px 28px; }
+      .kicker { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; color: #9a8c6a; font-weight: 700; }
+      h1 { font-size: 38px; line-height: 1.15; margin: 10px 0 8px; font-weight: 800; color: #111; }
+      .restyled h1 { font-weight: 600; color: #1d4ed8; letter-spacing: -0.01em; }
+      .byline { color: #6b6b6b; font-size: 14px; margin-bottom: 32px; }
+      p { font-size: 18px; line-height: 1.55; margin: 0 0 20px; }
+      .restyled p { line-height: 1.85; }
+      h2 { font-size: 24px; margin: 36px 0 10px; }
+      .restyled h2 { color: #1d4ed8; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <article id="article">
+      <div class="kicker">Engineering</div>
+      <h1>Why visual regressions slip through review</h1>
+      <p class="byline">By J. Okafor · 6 min read</p>
+      <p>Most teams catch logic bugs with unit tests, but the rendered page is a
+        different surface. A diff of 0.4% can be anti-aliasing, a ticking clock,
+        or a genuinely broken nav bar — and a tired reviewer treats them alike.</p>
+      <h2>The cost of noise</h2>
+      <p>When every run flags a diff, the diffs stop meaning anything. Teams mute
+        the checks within a few sprints, and the one real regression sails into
+        production behind a wall of false positives.</p>
+      <h2>A second opinion</h2>
+      <p>The fix is not more pixels — it is judgment. A reviewer that explains why
+        a diff is or isn't a regression turns a noisy signal into a trusted one.</p>
+    </article>
+    <script>
+      if (new URLSearchParams(location.search).get("v") === "restyled") {
+        document.getElementById("article").classList.add("restyled");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+# Local-dev infrastructure for naikan.
+#
+# MinIO provides an S3-compatible endpoint for the `baseline-store` module
+# (issue #04 / ADR-0002). Production uses real AWS S3 — the only difference is
+# config (S3_ENDPOINT + path-style addressing), so app code never branches on it.
+#
+# `postgres` + `worker` (issue #07) let the scheduler/queue consumer run in a
+# container, separate from the API. The worker runs on Node (ADR-0001).
+#
+#   docker compose up -d minio                 # MinIO API :9000, console :9001
+#   docker compose up postgres                 # local Postgres :5432
+#   bun migrate                                # create app tables (once), then:
+#   docker compose up worker                   # scheduler tick + graphile-worker
+#   # creds + bucket match .env.example (minioadmin / naikan-artifacts)
+services:
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      # Host port is overridable so worktrees don't collide; defaults preserve
+      # the documented :9000/:9001 when run by hand. `bun stack` sets these.
+      - "${CM_MINIO_PORT:-9000}:9000" # S3 API
+      - "${CM_MINIO_CONSOLE_PORT:-9001}:9001" # web console
+    volumes:
+      - minio-data:/data
+
+  # One-shot: create the artifact bucket so the stack is usable straight after
+  # `up`. The app's baseline-store.ensureBucket() also creates it idempotently,
+  # so this is convenience, not a hard dependency.
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 minioadmin minioadmin; do
+        echo 'waiting for minio...'; sleep 1;
+      done &&
+      mc mb --ignore-existing local/naikan-artifacts &&
+      echo 'bucket ready: naikan-artifacts'
+      "
+
+  # Local Postgres for the worker (and the API). Creds + db name match
+  # .env.example's DATABASE_URL. Skip this service if you already run Postgres
+  # on :5432; just point the worker's DATABASE_URL at your instance instead.
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: naikan
+    ports:
+      - "${CM_PG_PORT:-5432}:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d naikan"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # The scheduler tick + graphile-worker consumer (issue #07), runnable
+  # independently of the API. Runs on Node per ADR-0001; bun installs the
+  # workspace, node runs the worker (Node ≥ 22.18 strips .ts types natively).
+  # graphile-worker creates its own `graphile_worker` schema on boot, but the
+  # *app* tables must exist first — run `bun migrate` against this Postgres once.
+  worker:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/naikan
+      WORKER_CONCURRENCY: "5"
+    volumes:
+      - .:/app
+      # Keep host node_modules (host-arch binaries) out of the container.
+      - worker-node-modules:/app/node_modules
+    command:
+      - sh
+      - -c
+      - "npm i -g bun >/dev/null 2>&1 && bun install && bun run --cwd apps/worker start"
+
+volumes:
+  minio-data:
+  pg-data:
+  worker-node-modules:

@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // The worker runs on Node (ADR-0001); keep `bun-types` too for the `bun:test`
+    // module the integration tests import.
+    "types": ["node", "bun-types"]
+  },
+  "include": ["src"]
+}

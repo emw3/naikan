@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Ships as a stdio MCP server run under Node (ADR-0001/0005), but the unit
+    // tests import `bun:test` — keep both type roots, mirroring apps/worker.
+    "types": ["node", "bun-types"]
+  },
+  "include": ["src"]
+}

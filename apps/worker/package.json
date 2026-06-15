@@ -1,0 +1,27 @@
+{
+  "name": "@naikan/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.ts",
+    "test": "bun test",
+    "spike": "bun run spike/run.mjs"
+  },
+  "dependencies": {
+    "@naikan/alerter": "workspace:*",
+    "@naikan/baseline-store": "workspace:*",
+    "@naikan/config-repo": "workspace:*",
+    "@naikan/digest-builder": "workspace:*",
+    "@naikan/heartbeat-runner": "workspace:*",
+    "@naikan/kernel-core": "workspace:*",
+    "@naikan/scheduler": "workspace:*",
+    "@naikan/ui-runner": "workspace:*",
+    "graphile-worker": "^0.16.6",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "playwright": "^1.49.0"
+  }
+}

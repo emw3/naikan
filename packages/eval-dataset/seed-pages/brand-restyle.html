@@ -1,0 +1,60 @@
+<!doctype html>
+<!--
+  Seed page: brand-restyle  →  label: intentional
+  Baseline (?v=baseline):  indigo brand, squared buttons, flat cards.
+  Current  (?v=restyled):  teal brand, pill buttons, soft shadows + rounded
+  corners. A deliberate visual refresh — large pixel diff, but every element is
+  in the same place. The judge should call this intentional, not a regression.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orbit — Home</title>
+    <style>
+      :root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+              --brand: #4338ca; --brand-ink: #fff; --radius: 6px; --card-shadow: none;
+              --card-border: 1px solid #e5e7eb; --bg: #ffffff; }
+      body.restyled { --brand: #0d9488; --radius: 999px; --bg: #f0fdfa;
+                      --card-shadow: 0 10px 24px rgba(13,148,136,.12); --card-border: 1px solid #ccfbf1; }
+      body { margin: 0; background: var(--bg); color: #0f172a; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 22px 56px; }
+      .brand { font-weight: 800; font-size: 20px; color: var(--brand); }
+      .nav-cta { background: var(--brand); color: var(--brand-ink); padding: 9px 18px;
+                 border-radius: var(--radius); text-decoration: none; font-weight: 600; font-size: 14px; }
+      main { max-width: 1000px; margin: 0 auto; padding: 48px 56px; }
+      h1 { font-size: 40px; margin: 0 0 10px; }
+      .lede { color: #475569; font-size: 18px; margin: 0 0 36px; max-width: 560px; }
+      .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+      .feature { background: #fff; border: var(--card-border); border-radius: 14px;
+                 padding: 24px; box-shadow: var(--card-shadow); }
+      .feature .ic { width: 40px; height: 40px; border-radius: var(--radius);
+                     background: var(--brand); margin-bottom: 14px; }
+      .feature h3 { margin: 0 0 6px; font-size: 16px; }
+      .feature p { margin: 0; color: #64748b; font-size: 14px; line-height: 1.6; }
+      .cta { margin-top: 40px; display: inline-block; background: var(--brand); color: var(--brand-ink);
+             padding: 14px 26px; border-radius: var(--radius); font-weight: 700; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="brand">Orbit</span>
+      <a class="nav-cta" href="#">Sign up</a>
+    </header>
+    <main>
+      <h1>Everything in one place</h1>
+      <p class="lede">Orbit brings your projects, checks, and alerts together so nothing slips.</p>
+      <div class="features">
+        <div class="feature"><div class="ic"></div><h3>Monitor</h3><p>Watch every page across viewports, every day.</p></div>
+        <div class="feature"><div class="ic"></div><h3>Alert</h3><p>Page the right person the moment something breaks.</p></div>
+        <div class="feature"><div class="ic"></div><h3>Resolve</h3><p>See baseline, current, and diff side by side.</p></div>
+      </div>
+      <a class="cta" href="#">Get started free</a>
+    </main>
+    <script>
+      if (new URLSearchParams(location.search).get("v") === "restyled") {
+        document.body.classList.add("restyled");
+      }
+    </script>
+  </body>
+</html>

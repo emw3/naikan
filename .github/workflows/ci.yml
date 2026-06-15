@@ -1,0 +1,108 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run smoke
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      # Install from packages/capture so bunx resolves the workspace's pinned
+      # playwright (not the latest from npm) and downloads the exact browser
+      # build that `bun run test` launches.
+      - name: Install Playwright Chromium
+        working-directory: packages/capture
+        run: bunx playwright install --with-deps chromium
+      # Full suite: kernel + auth unit/integration tests plus the live-Chromium
+      # capture and ui-runner suites (hence the Playwright install above). The
+      # baseline-store MinIO suite is skipped here (no S3_ENDPOINT) and runs in
+      # the dedicated `artifact-store` job below.
+      - run: bun run test
+
+  artifact-store:
+    runs-on: ubuntu-latest
+    env:
+      S3_ENDPOINT: http://localhost:9000
+      S3_BUCKET: naikan-artifacts
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      # MinIO runs via `docker run` rather than a `services:` container because
+      # the official minio/minio image needs a `server /data` command, which
+      # GitHub Actions service containers cannot override.
+      - name: Start MinIO
+        run: |
+          docker run -d --name minio \
+            -p 9000:9000 \
+            -e MINIO_ROOT_USER=minioadmin \
+            -e MINIO_ROOT_PASSWORD=minioadmin \
+            minio/minio server /data
+      - name: Wait for MinIO to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:9000/minio/health/ready; then
+              echo "minio ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "minio did not become ready" >&2; exit 1
+      # baseline-store integration: put + get + presign + delete + list against
+      # real MinIO (the bucket is created idempotently by ensureBucket()).
+      - run: bun test packages/baseline-store
+
+  migrate:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: naikan
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/naikan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      # Migrations (baseline + users/sessions) apply against real Postgres,
+      # the seed inserts the first admin via the Pg user store, then the whole
+      # stack rolls back cleanly.
+      - run: bun run migrate
+      - run: bun run db:check
+      - run: bun run seed:admin
+        env:
+          SEED_ADMIN_EMAIL: admin@example.com
+          SEED_ADMIN_PASSWORD: ci-seed-password
+      - run: bun run migrate:down

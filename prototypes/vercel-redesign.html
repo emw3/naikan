@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Naikan Monitor — dark / Vercel direction (prototype)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================ TOKENS
+         Dark "Vercel dashboard / Geist" direction. Near-black surface, elevated
+         bordered panels, hue carries severity, dot+word status (a11y floor). */
+      :root {
+        /* surfaces — true-neutral dark ramp */
+        --bg: oklch(0.10 0 0); /* page ≈ #040404 (near-black) */
+        --panel: oklch(0.195 0 0); /* elevated card/table ≈ #121212 */
+        --panel-2: oklch(0.23 0 0); /* table header / inset ≈ #1a1a1a */
+        --hover: oklch(0.255 0 0); /* row / control hover */
+        --border: oklch(0.30 0 0); /* hairline ≈ #2b2b2b */
+        --border-strong: oklch(0.40 0 0); /* input / emphasized divider */
+
+        /* ink */
+        --ink: oklch(0.96 0 0); /* primary text ≈ #ededed */
+        --ink-muted: oklch(0.74 0 0); /* secondary ≈ #a8a8a8 (≥4.5:1) */
+        --ink-subtle: oklch(0.60 0 0); /* large/disabled only ≈ #808080 */
+
+        /* accent — Geist blue, links + focus + selection */
+        --accent: oklch(0.65 0.18 248);
+        --accent-ink: oklch(0.78 0.14 248); /* link text on dark */
+
+        /* status — solid dot, bright ink word (both AA on --bg / --panel) */
+        --ok: oklch(0.74 0.17 152);
+        --ok-ink: oklch(0.82 0.16 152);
+        --warn: oklch(0.80 0.15 80);
+        --warn-ink: oklch(0.85 0.14 82);
+        --fail: oklch(0.63 0.21 25);
+        --fail-ink: oklch(0.74 0.19 25);
+        --idle: oklch(0.62 0.012 250);
+        --idle-ink: oklch(0.70 0.012 250);
+
+        --r-sm: 5px;
+        --r-md: 8px;
+        --r-lg: 12px;
+        --r-full: 9999px;
+
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 20px;
+        --s6: 24px;
+        --s8: 32px;
+        --s10: 40px;
+
+        --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+
+        --t-display: 1.625rem; /* page title 26px */
+        --t-title: 1.0625rem; /* section 17px */
+        --t-body: 0.875rem; /* base 14px (dense) */
+        --t-sm: 0.8125rem; /* 13px table/meta */
+        --t-xs: 0.75rem; /* 12px labels/badges */
+
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        --dur: 140ms;
+        --z-sticky: 100;
+
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 16px;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-size: var(--t-body);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      a {
+        color: var(--accent-ink);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .mono {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
+      .muted {
+        color: var(--ink-muted);
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        border-radius: var(--r-sm);
+      }
+
+      /* ============================================================ APP SHELL */
+      .app {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        grid-template-rows: 52px 1fr;
+        grid-template-areas: "sidebar topbar" "sidebar main";
+        min-height: 100vh;
+      }
+      .topbar {
+        grid-area: topbar;
+        position: sticky;
+        top: 0;
+        z-index: var(--z-sticky);
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        height: 52px;
+        padding: 0 var(--s6);
+        background: color-mix(in oklch, var(--bg) 86%, transparent);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+      }
+      .crumbs {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        font-size: var(--t-sm);
+        color: var(--ink-muted);
+        min-width: 0;
+      }
+      .crumbs .here {
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .crumbs .slash {
+        color: var(--border-strong);
+      }
+      .topbar .spacer {
+        flex: 1;
+      }
+      .topbar .env {
+        font-size: var(--t-xs);
+        color: var(--ink-muted);
+        border: 1px solid var(--border);
+        border-radius: var(--r-full);
+        padding: 3px 10px;
+      }
+      .who {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        font-size: var(--t-sm);
+      }
+      .who .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: var(--r-full);
+        background: linear-gradient(135deg, oklch(0.5 0.13 248), oklch(0.45 0.16 300));
+        display: grid;
+        place-items: center;
+        font-size: var(--t-xs);
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .sidebar {
+        grid-area: sidebar;
+        background: var(--bg);
+        border-right: 1px solid var(--border);
+        padding: var(--s4) var(--s3);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        padding: var(--s2) var(--s3) var(--s4);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        font-size: 0.9375rem;
+      }
+      .brand .mark {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background: var(--ink);
+        color: var(--bg);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .nav-label {
+        font-size: var(--t-xs);
+        color: var(--ink-subtle);
+        font-weight: 500;
+        padding: var(--s3) var(--s3) var(--s1);
+      }
+      .navlink {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        padding: 7px var(--s3);
+        border-radius: var(--r-md);
+        color: var(--ink-muted);
+        font-size: var(--t-body);
+        cursor: pointer;
+        background: none;
+        border: none;
+        text-align: left;
+        width: 100%;
+        font-family: inherit;
+        transition:
+          color var(--dur) var(--ease),
+          background var(--dur) var(--ease);
+      }
+      .navlink svg {
+        width: 16px;
+        height: 16px;
+        flex: none;
+        opacity: 0.85;
+      }
+      .navlink .count {
+        margin-left: auto;
+        font-size: var(--t-xs);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-subtle);
+      }
+      .navlink:hover {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .navlink.active {
+        color: var(--ink);
+        background: var(--panel);
+        font-weight: 500;
+      }
+      .navlink.active .count.bad {
+        color: var(--fail-ink);
+      }
+      .sidebar .divider {
+        height: 1px;
+        background: var(--border);
+        margin: var(--s3) var(--s2);
+      }
+      .cl-link .dot {
+        margin-left: auto;
+      }
+
+      .main {
+        grid-area: main;
+        min-width: 0; /* let the grid item shrink so tables scroll inside, not push the page wide */
+        padding: var(--s8) var(--s10);
+        max-width: 1180px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      /* ============================================================ PAGE HEAD */
+      .pagehead {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--s4);
+        margin-bottom: var(--s6);
+      }
+      .pagehead h1 {
+        font-size: var(--t-display);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+      .pagehead .lede {
+        margin-top: 6px;
+        color: var(--ink-muted);
+        font-size: var(--t-sm);
+      }
+      .pagehead .spacer {
+        flex: 1;
+      }
+      .backlink {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ink-muted);
+        font-size: var(--t-sm);
+        margin-bottom: var(--s4);
+      }
+      .backlink:hover {
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      /* ============================================================ BUTTONS */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: inherit;
+        font-size: var(--t-sm);
+        font-weight: 500;
+        padding: 7px 13px;
+        border-radius: var(--r-md);
+        cursor: pointer;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        transition:
+          background var(--dur) var(--ease),
+          border-color var(--dur) var(--ease),
+          opacity var(--dur) var(--ease);
+      }
+      .btn-primary {
+        background: var(--ink);
+        color: var(--bg);
+      }
+      .btn-primary:hover {
+        background: oklch(0.86 0 0);
+      }
+      .btn-secondary {
+        background: var(--panel);
+        color: var(--ink);
+        border-color: var(--border-strong);
+      }
+      .btn-secondary:hover {
+        background: var(--hover);
+        border-color: var(--ink-subtle);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink-muted);
+      }
+      .btn-ghost:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+
+      /* ============================================================ STAT TILES */
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--s4);
+        margin-bottom: var(--s6);
+      }
+      .tile {
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--panel);
+        padding: var(--s4) var(--s5);
+      }
+      .tile .k {
+        font-size: var(--t-sm);
+        color: var(--ink-muted);
+      }
+      .tile .v {
+        margin-top: 6px;
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+      }
+      .tile .v small {
+        font-size: var(--t-sm);
+        font-weight: 500;
+        color: var(--ink-muted);
+      }
+      .tile .v.bad {
+        color: var(--fail-ink);
+      }
+
+      /* ============================================================ PANEL + TABLE */
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--panel);
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        padding: var(--s3) var(--s4);
+        border-bottom: 1px solid var(--border);
+      }
+      .panel-head h2 {
+        font-size: var(--t-body);
+        font-weight: 600;
+      }
+      .panel-head .n {
+        font-size: var(--t-xs);
+        color: var(--ink-muted);
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-full);
+        padding: 1px 8px;
+        font-variant-numeric: tabular-nums;
+      }
+      .panel-head .spacer {
+        flex: 1;
+      }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        background: var(--bg);
+        border: 1px solid var(--border-strong);
+        border-radius: var(--r-md);
+        padding: 5px 10px;
+        color: var(--ink-muted);
+        font-size: var(--t-sm);
+        min-width: 200px;
+      }
+      .search input {
+        background: none;
+        border: none;
+        outline: none;
+        color: var(--ink);
+        font-family: inherit;
+        font-size: var(--t-sm);
+        width: 100%;
+      }
+      .search input::placeholder {
+        color: var(--ink-muted);
+      }
+
+      .tbl-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .tbl {
+        width: 100%;
+        min-width: 600px; /* below this the wrapper scrolls horizontally (mobile) */
+        border-collapse: collapse;
+        font-size: var(--t-sm);
+      }
+      .tbl thead th {
+        text-align: left;
+        font-weight: 500;
+        color: var(--ink-muted);
+        font-size: var(--t-xs);
+        padding: 10px var(--s4);
+        background: var(--panel-2);
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      .tbl th.num,
+      .tbl td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .tbl tbody td {
+        padding: 13px var(--s4);
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+      }
+      .tbl tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .tbl tbody tr {
+        cursor: pointer;
+        transition: background var(--dur) var(--ease);
+      }
+      .tbl tbody tr:hover {
+        background: var(--hover);
+      }
+      .tbl .primary {
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .tbl .sub {
+        color: var(--ink-muted);
+        font-size: var(--t-xs);
+        margin-top: 2px;
+      }
+      .tbl td .chev {
+        color: var(--ink-subtle);
+      }
+      td.shrink {
+        width: 1%;
+        white-space: nowrap;
+      }
+
+      /* ============================================================ STATUS (dot + word) */
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        white-space: nowrap;
+        font-size: var(--t-sm);
+        font-weight: 500;
+      }
+      .status .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: var(--r-full);
+        flex: none;
+      }
+      .status.ok {
+        color: var(--ok-ink);
+      }
+      .status.ok .dot {
+        background: var(--ok);
+      }
+      .status.warn {
+        color: var(--warn-ink);
+      }
+      .status.warn .dot {
+        background: var(--warn);
+      }
+      .status.fail {
+        color: var(--fail-ink);
+      }
+      .status.fail .dot {
+        background: var(--fail);
+        box-shadow: 0 0 0 4px color-mix(in oklch, var(--fail) 22%, transparent);
+      }
+      .status.idle {
+        color: var(--idle-ink);
+      }
+      .status.idle .dot {
+        background: var(--idle);
+      }
+
+      /* small inline dot for the sidebar project list */
+      .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: var(--r-full);
+      }
+      .dot.ok {
+        background: var(--ok);
+      }
+      .dot.warn {
+        background: var(--warn);
+      }
+      .dot.fail {
+        background: var(--fail);
+        box-shadow: 0 0 0 3px color-mix(in oklch, var(--fail) 22%, transparent);
+      }
+
+      /* kind tag (heartbeat / UI) */
+      .tag {
+        display: inline-block;
+        font-size: var(--t-xs);
+        font-weight: 500;
+        color: var(--ink-muted);
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: var(--r-sm);
+        padding: 1px 7px;
+        margin-right: 6px;
+      }
+
+      .view {
+        display: none;
+        animation: rise var(--dur) var(--ease) both;
+      }
+      .view.active {
+        display: block;
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .view {
+          animation: none;
+        }
+      }
+
+      /* hamburger — mobile only */
+      .menu-btn {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        margin-left: -6px;
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        background: var(--panel);
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .menu-btn svg {
+        width: 17px;
+        height: 17px;
+      }
+      .backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        background: oklch(0 0 0 / 0.6);
+        opacity: 0;
+        transition: opacity var(--dur) var(--ease);
+      }
+
+      @media (max-width: 1000px) {
+        .tiles {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 760px) {
+        .app {
+          grid-template-columns: 1fr;
+          grid-template-areas: "topbar" "main";
+        }
+        .menu-btn {
+          display: inline-flex;
+        }
+        .who .muted {
+          display: none;
+        }
+        .topbar {
+          padding: 0 var(--s4);
+        }
+        .main {
+          padding: var(--s5) var(--s4);
+        }
+        .pagehead {
+          flex-wrap: wrap;
+        }
+        .pagehead h1 {
+          font-size: 1.375rem;
+        }
+
+        /* sidebar becomes an off-canvas drawer */
+        .sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 264px;
+          z-index: 95;
+          transform: translateX(-100%);
+          transition: transform var(--dur) var(--ease);
+          will-change: transform;
+        }
+        .app.nav-open .sidebar {
+          transform: none;
+          box-shadow: 0 16px 48px -8px oklch(0 0 0 / 0.6);
+        }
+        .app.nav-open .backdrop {
+          display: block;
+          opacity: 1;
+        }
+      }
+      @media (max-width: 480px) {
+        .tiles {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          gap: var(--s3);
+        }
+        .tile {
+          padding: var(--s3) var(--s4);
+        }
+        .tile .v {
+          font-size: 1.25rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .sidebar,
+        .backdrop {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- ====================== SIDEBAR ====================== -->
+      <aside class="sidebar">
+        <div class="brand"><span class="mark">C</span> Naikan Monitor</div>
+
+        <button class="navlink active" data-go="projects">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" />
+          </svg>
+          Projects <span class="count">6</span>
+        </button>
+        <button class="navlink" data-go="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 12h4l3 8 4-16 3 8h4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Incidents <span class="count bad">2</span>
+        </button>
+        <button class="navlink" data-go="projects">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round" />
+          </svg>
+          Users
+        </button>
+
+        <div class="divider"></div>
+        <div class="nav-label">My projects</div>
+        <button class="navlink cl-link" data-go="overview">Northwind Coffee <span class="dot fail"></span></button>
+        <button class="navlink cl-link" data-go="overview">Acme Retail <span class="dot warn"></span></button>
+        <button class="navlink cl-link" data-go="projects">Bluebird Studio</button>
+        <button class="navlink cl-link" data-go="projects">Harbor Logistics</button>
+      </aside>
+
+      <!-- ====================== TOPBAR ====================== -->
+      <header class="topbar">
+        <button class="menu-btn" id="menu-btn" aria-label="Open navigation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round" />
+          </svg>
+        </button>
+        <nav class="crumbs" id="crumbs">
+          <span class="here">Projects</span>
+        </nav>
+        <div class="spacer"></div>
+        <span class="env">Production</span>
+        <div class="who">
+          <span class="muted">gustavo@example.com</span>
+          <span class="avatar">GL</span>
+        </div>
+      </header>
+
+      <!-- ====================== MAIN ====================== -->
+      <main class="main">
+        <!-- ============ VIEW: PROJECTS PORTFOLIO (table) ============ -->
+        <section class="view active" id="view-projects">
+          <div class="pagehead">
+            <div>
+              <h1>Projects</h1>
+              <p class="lede">6 projects monitored · 2 with open incidents</p>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn btn-secondary">Filter</button>
+            <button class="btn btn-primary">+ New project</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Portfolio</h2>
+              <span class="n">6</span>
+              <div class="spacer"></div>
+              <label class="search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M21 21l-4-4" stroke-linecap="round" />
+                </svg>
+                <input placeholder="Search projects…" />
+              </label>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Status</th>
+                    <th class="num">Open incidents</th>
+                    <th class="num">Checks</th>
+                    <th>Account manager</th>
+                    <th class="num">Retention</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="projects-rows"></tbody>
+              </table>
+            </div>
+          </div>
+          <p class="muted" style="margin-top: 12px; font-size: var(--t-xs)">
+            Note: the Status / Open incidents / Checks columns need data the current
+            <code class="mono">GET /api/projects</code> does not return yet — flagged in ADR-0007 as a backend follow-up.
+          </p>
+        </section>
+
+        <!-- ============ VIEW: PROJECT OVERVIEW (summary panels) ============ -->
+        <section class="view" id="view-overview">
+          <a class="backlink" data-go="projects" href="#">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Projects
+          </a>
+          <div class="pagehead">
+            <div>
+              <h1>Northwind Coffee</h1>
+              <p class="lede">ops@northwind.test · 3 sites · 90-day retention</p>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn btn-secondary">Run all checks</button>
+            <button class="btn btn-secondary">Manage</button>
+          </div>
+
+          <div class="tiles">
+            <div class="tile">
+              <div class="k">Status</div>
+              <div class="v"><span class="status fail"><span class="dot"></span>Down</span></div>
+            </div>
+            <div class="tile">
+              <div class="k">Open incidents</div>
+              <div class="v bad">2</div>
+            </div>
+            <div class="tile">
+              <div class="k">Checks</div>
+              <div class="v">9 <small>7 ok · 2 failing</small></div>
+            </div>
+            <div class="tile">
+              <div class="k">Uptime (24h)</div>
+              <div class="v">98.4<small>%</small></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Checks</h2>
+              <span class="n">9</span>
+              <div class="spacer"></div>
+              <button class="btn btn-ghost">Group by site</button>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>Check</th>
+                    <th>Kind</th>
+                    <th class="num">Last 24h</th>
+                    <th class="num">Latency</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="checks-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div class="backdrop" id="backdrop"></div>
+    </div>
+
+    <script>
+      // ---- seed data (faithful to the real Project / OverviewCheck shapes) ----
+      const STATUS = {
+        ok: ["ok", "Operational"],
+        warn: ["warn", "Degraded"],
+        fail: ["fail", "Down"],
+        idle: ["idle", "Pending"],
+      };
+      function statusEl(s) {
+        const [cls, label] = STATUS[s];
+        return `<span class="status ${cls}"><span class="dot"></span>${label}</span>`;
+      }
+
+      const projects = [
+        { name: "Northwind Coffee", contacts: "ops@northwind.test", status: "fail", incidents: 2, checks: 9, manager: "gustavo@example.com", retention: 90 },
+        { name: "Acme Retail", contacts: "it@acme.test", status: "warn", incidents: 0, checks: 14, manager: "maria@example.com", retention: 90 },
+        { name: "Bluebird Studio", contacts: "hello@bluebird.test", status: "ok", incidents: 0, checks: 5, manager: "gustavo@example.com", retention: 30 },
+        { name: "Harbor Logistics", contacts: "noc@harbor.test", status: "ok", incidents: 0, checks: 11, manager: "maria@example.com", retention: 180 },
+        { name: "Cedar Health", contacts: "web@cedar.test", status: "ok", incidents: 0, checks: 8, manager: "tomás@example.com", retention: 90 },
+        { name: "Vela Travel", contacts: "—", status: "idle", incidents: 0, checks: 2, manager: "Unassigned", retention: 90 },
+      ];
+
+      const checks = [
+        { host: "northwind.test", path: "/", kind: "heartbeat", tally: "286/288 passed", lat: "184 ms", status: "ok" },
+        { host: "northwind.test", path: "/checkout", kind: "heartbeat", tally: "271/288 · 17 failed", lat: "—", status: "fail" },
+        { host: "api.northwind.test", path: "/health", kind: "heartbeat", tally: "288/288 passed", lat: "92 ms", status: "ok" },
+        { host: "northwind.test", path: "/", kind: "uicheck", tally: "1/1 passed", lat: "—", status: "ok" },
+        { host: "northwind.test", path: "/menu", kind: "uicheck", tally: "0/1 · 1 failed", lat: "—", status: "fail" },
+        { host: "api.northwind.test", path: "/v2/orders", kind: "heartbeat", tally: "288/288 passed", lat: "143 ms", status: "ok" },
+        { host: "northwind.test", path: "/about", kind: "uicheck", tally: "no runs in 24h", lat: "—", status: "idle" },
+        { host: "shop.northwind.test", path: "/", kind: "heartbeat", tally: "288/288 passed", lat: "210 ms", status: "ok" },
+        { host: "shop.northwind.test", path: "/cart", kind: "heartbeat", tally: "287/288 passed", lat: "176 ms", status: "ok" },
+      ];
+
+      const chev = `<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+      document.getElementById("projects-rows").innerHTML = projects
+        .map(
+          (c) => `
+        <tr data-go="overview">
+          <td>
+            <div class="primary">${c.name}</div>
+            <div class="sub">${c.contacts}</div>
+          </td>
+          <td>${statusEl(c.status)}</td>
+          <td class="num">${c.incidents > 0 ? `<span class="status fail" style="justify-content:flex-end"><span class="dot"></span>${c.incidents}</span>` : '<span class="muted">0</span>'}</td>
+          <td class="num">${c.checks}</td>
+          <td class="muted">${c.manager}</td>
+          <td class="num mono">${c.retention}d</td>
+          <td class="shrink">${chev}</td>
+        </tr>`,
+        )
+        .join("");
+
+      document.getElementById("checks-rows").innerHTML = checks
+        .map(
+          (c) => `
+        <tr>
+          <td><span class="mono primary">${c.host}${c.path}</span></td>
+          <td><span class="tag">${c.kind === "uicheck" ? "UI" : "heartbeat"}</span></td>
+          <td class="num muted">${c.tally}</td>
+          <td class="num mono ${c.lat === "—" ? "muted" : ""}">${c.lat}</td>
+          <td>${statusEl(c.status)}</td>
+          <td class="shrink">${chev}</td>
+        </tr>`,
+        )
+        .join("");
+
+      // ---- view switching ----
+      const crumbsFor = {
+        projects: '<span class="here">Projects</span>',
+        overview:
+          '<a href="#" data-go="projects">Projects</a><span class="slash">/</span><span class="here">Northwind Coffee</span>',
+      };
+      const app = document.querySelector(".app");
+      function go(view) {
+        document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+        document.getElementById("view-" + view).classList.add("active");
+        document.getElementById("crumbs").innerHTML = crumbsFor[view];
+        document.querySelectorAll("[data-go]").forEach((b) => {
+          if (b.classList.contains("navlink")) b.classList.toggle("active", b.dataset.go === view);
+        });
+        app.classList.remove("nav-open"); // close the mobile drawer on navigate
+        window.scrollTo(0, 0);
+      }
+      document.addEventListener("click", (e) => {
+        const t = e.target.closest("[data-go]");
+        if (t) {
+          e.preventDefault();
+          go(t.dataset.go);
+        }
+      });
+
+      // ---- mobile drawer ----
+      document.getElementById("menu-btn").addEventListener("click", () => app.classList.add("nav-open"));
+      document.getElementById("backdrop").addEventListener("click", () => app.classList.remove("nav-open"));
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") app.classList.remove("nav-open");
+      });
+    </script>
+  </body>
+</html>

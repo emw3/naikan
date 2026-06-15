@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    // Node types for the cross-runtime globals (crypto.randomUUID) — config-repo is
+    // consumed by both the Bun API and the Node worker, so it stays runtime-agnostic
+    // per ADR-0005 (no bun-types).
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

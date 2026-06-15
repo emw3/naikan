@@ -1,0 +1,51 @@
+{
+  "bun": {
+    "runtime": {
+      "name": "bun",
+      "version": "1.3.14"
+    },
+    "iterations": 50,
+    "successCount": 46,
+    "failureCount": 4,
+    "peakRssMB": 145.8,
+    "avgRunMs": 225.4,
+    "avgLaunchMs": 59.2,
+    "totalWallSec": 138,
+    "consoleCountSample": 2,
+    "screenshotBytesSample": 10910,
+    "failures": [
+      {
+        "i": 22,
+        "error": "waitForSelector: Timeout 30000ms exceeded."
+      },
+      {
+        "i": 26,
+        "error": "launch: Timeout 30000ms exceeded."
+      },
+      {
+        "i": 37,
+        "error": "launch: Timeout 30000ms exceeded."
+      },
+      {
+        "i": 44,
+        "error": "launch: Timeout 30000ms exceeded."
+      }
+    ]
+  },
+  "node": {
+    "runtime": {
+      "name": "node",
+      "version": "22.19.0"
+    },
+    "iterations": 50,
+    "successCount": 50,
+    "failureCount": 0,
+    "peakRssMB": 167.5,
+    "avgRunMs": 225.5,
+    "avgLaunchMs": 60.3,
+    "totalWallSec": 13,
+    "consoleCountSample": 2,
+    "screenshotBytesSample": 10910,
+    "failures": []
+  }
+}

@@ -1,0 +1,55 @@
+/** Public surface of `@naikan/config-repo`. */
+export type {
+  Actor,
+  AgentVerdict,
+  AgentVerdictInput,
+  AlertRouting,
+  AuditAction,
+  AuditDiff,
+  AuditLogEntry,
+  BodyAssertion,
+  CheckGroup,
+  CheckGroupInput,
+  CheckGroupPatch,
+  CheckRun,
+  CheckRunInput,
+  CheckRunStatus,
+  CheckType,
+  Project,
+  ProjectInput,
+  ProjectPatch,
+  ConfigStore,
+  EffectiveHeartbeatCheck,
+  EffectiveUICheck,
+  HeartbeatCheck,
+  HeartbeatCheckInput,
+  HeartbeatCheckPatch,
+  Incident,
+  PerfBudget,
+  Severity,
+  Site,
+  SiteInput,
+  SitePatch,
+  UICheck,
+  UICheckInput,
+  UICheckPatch,
+  User,
+  UserRole,
+  VerdictKind,
+} from "./types.ts";
+export { createConfigRepo, ValidationError, type ConfigRepo, type ConfigRepoDeps } from "./repo.ts";
+export { InMemoryConfigStore } from "./in-memory-store.ts";
+export { createPgConfigStore } from "./pg-store.ts";
+export {
+  resolveEffectiveCheck,
+  resolveEffectiveUICheck,
+  SYSTEM_DEFAULT_INTERVAL_SECONDS,
+  SYSTEM_DEFAULT_ALERT_AFTER_N_FAILS,
+  SYSTEM_DEFAULT_UI_INTERVAL_SECONDS,
+} from "./effective.ts";
+export {
+  applyIncidentForRun,
+  applyUIIncidentForRun,
+  type ApplyIncidentDeps,
+  type ApplyUIIncidentDeps,
+} from "./incident-orchestrator.ts";

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Naikan Spike Fixture</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 40px; }
+      .box { width: 200px; height: 120px; background: #2b6; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1 id="heading">Spike fixture page</h1>
+    <p data-testid="status">ok</p>
+    <div class="box"></div>
+    <script>
+      // Exercise console capture: one log + one error per load.
+      console.log("fixture: loaded");
+      console.error("fixture: synthetic error for capture test");
+      // A tiny bit of layout work so perf timing is non-trivial.
+      for (let i = 0; i < 5000; i++) {
+        const s = document.createElement("span");
+        s.textContent = ".";
+        document.body.appendChild(s);
+      }
+    </script>
+  </body>
+</html>

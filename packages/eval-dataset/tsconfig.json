@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    // Node types (Buffer/process/fs) — runtime-agnostic leaf, mirrors
+    // baseline-store; the loader runs under both Bun and Node (ADR-0005).
+    "types": ["node"]
+  },
+  "include": ["src"]
+}

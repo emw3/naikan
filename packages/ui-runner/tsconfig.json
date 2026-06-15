@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    // Node types for Buffer; no bun-types so the kernel stays runtime-agnostic
+    // per ADR-0005.
+    "types": ["node"]
+  },
+  "include": ["src"]
+}
